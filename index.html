@@ -1,0 +1,95 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Adaptive Traffic Signal Simulator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.js"></script>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header class="page-header">
+      <h1>Adaptive Traffic Signal Simulator</h1>
+      <p class="subtitle">
+        A greedy-allocation traffic controller that assigns green-phase duration
+        proportional to real-time vehicle density — compared against a
+        fixed-timer baseline.
+      </p>
+    </header>
+
+    <main class="main-layout">
+      <aside class="stats-panel">
+        <h2>Live Telemetry</h2>
+        <div class="stat-row">
+          <span class="stat-label">Active Phase</span>
+          <span class="stat-value" id="statPhase">A</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">Time Remaining</span>
+          <span class="stat-value" id="statTime">--s</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">N Queue</span>
+          <span class="stat-value" id="statN">0</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">S Queue</span>
+          <span class="stat-value" id="statS">0</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">E Queue</span>
+          <span class="stat-value" id="statE">0</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">W Queue</span>
+          <span class="stat-value" id="statW">0</span>
+        </div>
+      </aside>
+
+      <section class="sim-panel">
+        <div id="canvas-container"></div>
+      </section>
+
+      <aside class="controls-panel">
+        <h2>Arrival Rates</h2>
+        <div class="control-group">
+          <label for="rateN">North <span id="valN">1.0</span></label>
+          <input type="range" id="rateN" min="0" max="5" value="1" step="0.1" />
+        </div>
+        <div class="control-group">
+          <label for="rateS">South <span id="valS">1.0</span></label>
+          <input type="range" id="rateS" min="0" max="5" value="1" step="0.1" />
+        </div>
+        <div class="control-group">
+          <label for="rateE">East <span id="valE">1.0</span></label>
+          <input type="range" id="rateE" min="0" max="5" value="1" step="0.1" />
+        </div>
+        <div class="control-group">
+          <label for="rateW">West <span id="valW">1.0</span></label>
+          <input type="range" id="rateW" min="0" max="5" value="1" step="0.1" />
+        </div>
+      </aside>
+    </main>
+
+    <footer class="explainer">
+      <h2>How it works</h2>
+      <p>
+        Each lane is modeled as a node in a conflict graph — North/South and
+        East/West form two non-conflicting phase groups via 2-coloring. Every
+        cycle, green-time is allocated using a greedy proportional rule:
+        <code
+          >green(phase) = max(minGreen, (vehicles_in_phase / total_vehicles) ×
+          cycleDuration)</code
+        >, then normalized to fit the fixed cycle window. Lanes with heavier
+        queues receive longer green phases automatically, reducing average wait
+        time compared to fixed-interval signals.
+      </p>
+    </footer>
+
+    <script src="scheduler.js"></script>
+    <script src="sketch.js"></script>
+  </body>
+</html>
